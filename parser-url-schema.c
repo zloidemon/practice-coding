@@ -11,7 +11,7 @@
  * @param address pointer to element of URL struct
  * @param param pointer to name element for output
  */
-#define CLEAN_struct(address, param)			\
+#define FREE_struct(address, param)			\
 	if (NULL != address) {				\
 		printf("\t%s: %s\n", param, address);	\
 		free((void *)address);			\
@@ -41,13 +41,12 @@ alloc_line(char *string, int size)
 	static char *buf;
 	buf = malloc(sizeof(char) * size);
 	if (NULL != buf) {
-		memcpy((void *)buf, (void *)string, size);
+		memcpy((void *)buf, (void *)string, size + 1);
 		buf[size] = '\0';
 		return buf;
 	} else {
 		printf("Could not allocate memory.\n");
 		exit(1);
-//		return NULL;
 	}
 }
 
@@ -73,7 +72,8 @@ parse_colon(char *string, char **result1, char **result2, int size)
 		} else if (counter == 0 && ':' == *string) {
 			return 1;
 		} else {
-			++string && ++counter;
+			++string;
+			++counter;
 		}
 		--size;
 	}
@@ -131,7 +131,8 @@ parse_line(URL *url, char **string, int counter)
 			right_size = counter;
 			counter = 0;
 		} else {
-			++(*string) && ++counter;
+			++(*string);
+			++counter;
 		}
 	}
 
@@ -177,7 +178,8 @@ parse_schema(URL **url, char **string, int counter)
 		} else {
 			sub_counter = 0;
 		}
-		++counter && ++(*string);
+		++counter;
+		++(*string);
 	}
 	return 1;
 }
@@ -212,7 +214,8 @@ parse_url(URL *url, char *string)
 					break;
 				}
 				default: {
-					++counter && ++string;
+					++counter;
+					++string;
 				}
 			}
 		}
@@ -234,11 +237,11 @@ show_result(URL *url, char *string)
 		printf("Error parsing: %s.\n", string);
 	}
 
-	CLEAN_struct(url->schema,   "schema");
-	CLEAN_struct(url->login,    "login");
-	CLEAN_struct(url->password, "password");
-	CLEAN_struct(url->host,     "host");
-	CLEAN_struct(url->port	,   "port");
+	FREE_struct(url->schema,   "schema");
+	FREE_struct(url->login,    "login");
+	FREE_struct(url->password, "password");
+	FREE_struct(url->host,     "host");
+	FREE_struct(url->port	,   "port");
 }
 
 int
