@@ -39,9 +39,9 @@ char *
 alloc_line(char *string, int size)
 {
 	static char *buf;
-	buf = malloc(sizeof(char) * size);
+	buf = malloc(sizeof(char) * (size + 1));
 	if (NULL != buf) {
-		memcpy((void *)buf, (void *)string, size + 1);
+		memcpy((void *)buf, (void *)string, size);
 		buf[size] = '\0';
 		return buf;
 	} else {
